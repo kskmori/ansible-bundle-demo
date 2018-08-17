@@ -1,0 +1,11 @@
+- name: create bundle log directory
+  file: path=/var/log/pacemaker/bundles/httpd-bundle-{{ index }} state=directory
+
+- name: create container contents directory
+  file: path=/var/local/containers/httpd-bundle-{{ index }} state=directory
+
+- name: create container contents file
+  template:
+    src: index.html.j2
+    dest: /var/local/containers/httpd-bundle-{{ index }}/index.html
+

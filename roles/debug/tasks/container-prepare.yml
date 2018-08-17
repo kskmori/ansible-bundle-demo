@@ -1,0 +1,4 @@
+- debug: var=index
+
+- name: file
+  file: path=/var/log/pacemaker/bundles/httpd-bundle-{{ index }} state=directory

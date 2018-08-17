@@ -1,0 +1,11 @@
+#[hacluster]
+#centos75-61
+#centos75-62
+
+[hacluster.centos75]
+centos75-61
+centos75-62
+
+[hacluster:children]
+hacluster.centos75
+

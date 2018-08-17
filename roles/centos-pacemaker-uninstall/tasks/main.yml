@@ -1,0 +1,46 @@
+- name: uninstall packages
+  yum:
+    name="{{ item }}"
+    state=absent
+  with_items:
+    - pcs
+    - pacemaker
+    - corosync
+    - libqb
+    - resource-agents
+    - fence-agents-*
+    - fence-virt
+    - python-clufter
+    - clufter-bin
+    - clufter-common
+
+### remove firewalld configuration
+- name: check if firewalld is enabled
+  command: firewall-cmd --state
+  changed_when: false
+  failed_when: false
+  register: firewalld_state
+
+- name: remove firewalld configuration for Pacemaker/Corosync (permanent)
+  command: firewall-cmd --permanent --remove-service=high-availability
+  register: result
+  changed_when: '"NOT_ENABLED" not in result.stderr'
+  when: firewalld_state.rc == 0
+
+- name: remove firewalld configuration for Pacemaker/Corosync (runtime)
+  command: firewall-cmd --remove-service=high-availability
+  register: result
+  changed_when: '"NOT_ENABLED" not in result.stderr'
+  when: firewalld_state.rc == 0
+
+- name: remove config files
+  file: name="{{ item }}" state=absent
+  with_items:
+    - /etc/corosync/corosync.conf
+    - /etc/corosync/authkey
+    - /etc/sysconfig/pacemaker
+
+- name: remove CIB config if requested
+  file: path=/var/lib/pacemaker state=absent
+  when: REMOVE_CIB | bool
+

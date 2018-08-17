@@ -1,0 +1,16 @@
+- debug: var=USE_PROXY
+
+- name: options
+  command: echo {{ ('--arg ' + USE_PROXY|join(' --arg ')) if USE_PROXY is defined else '' }}
+  register: buildargs
+
+- debug: var=buildargs
+  
+- name: jinja2 join
+  template:
+    src: proxytest.j2
+    dest: /root/proxytest
+  when: USE_PROXY is defined
+
+
+

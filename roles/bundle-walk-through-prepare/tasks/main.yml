@@ -1,0 +1,38 @@
+- name: prepare for each container contents
+  include: container-prepare.yml index={{ item }}
+  with_sequence: start=0 count={{ BUNDLE_REPLICAS }}
+
+- name: create bundle demo working directory
+  file: path={{ BUNDLE_WORK_DIR }} state=directory
+
+- name: prepare apache configuration file inside the container
+  template:
+    src: status.conf
+    dest: "{{ BUNDLE_WORK_DIR }}/status.conf"
+
+- name: prepare Dockerfile
+  template:
+    src: Dockerfile
+    dest: "{{ BUNDLE_WORK_DIR }}/Dockerfile"
+  register: dockerfile
+
+- name: check the bundle container image
+  command: docker images pcmktest:http -q
+  changed_when: false
+  register: imageid
+
+- name: remove the bundle container (when changed and old one exist)
+  command: docker rmi pcmktest:http
+  changed_when: false
+  when: dockerfile.changed and imageid.stdout != ""
+
+- name: setup --build-arg for proxy configuration
+  command: echo {{ (' --build-arg ' + USE_PROXY|join(' --build-arg ')) if USE_PROXY is defined else '' }}
+  changed_when: false
+  register: buildargs
+
+- name: rebuild the bundle container (when changed or image not exist)
+  command: docker build -t pcmktest:http {{ buildargs.stdout }} .
+  args:
+    chdir: "{{ BUNDLE_WORK_DIR }}"
+  when: dockerfile.changed or imageid.stdout == ""

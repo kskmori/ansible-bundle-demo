@@ -1,0 +1,5 @@
+{% for p in USE_PROXY %}
+ env {{ p }}
+{% endfor %}
+
+Environment="{{ USE_PROXY|join('" "') }}"

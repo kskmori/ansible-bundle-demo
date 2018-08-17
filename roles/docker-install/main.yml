@@ -1,0 +1,12 @@
+- name: install docker
+  yum:
+    name=docker
+    update_cache=yes
+    state=present
+
+- name: enable docker
+  systemd:
+    name: docker
+    enabled: yes
+    state: started
+

@@ -1,0 +1,42 @@
+# https://access.redhat.com/documentation/en-us/red_hat_enterprise_linux/7/html/high_availability_add-on_administration/ch-startup-haaa#s1-clusterinstall-HAAA
+
+- name: install packages
+  yum:
+    name="{{ item }}"
+    state=present
+    update_cache=yes
+  with_items:
+    - pcs
+    - pacemaker
+    - fence-agents-all
+
+### allow communitation ports if firewalld is in use
+- name: check if firewalld is enabled
+  command: firewall-cmd --state
+  changed_when: false
+  failed_when: false
+  register: firewalld_state
+
+- name: allow Pacemaker/Corosync communication through firewalld (permanent)
+  command: firewall-cmd --permanent --add-service=high-availability
+  register: result
+  changed_when: '"ALREADY_ENABLED" not in result.stderr'
+  when: firewalld_state.rc == 0
+
+- name: allow Pacemaker/Corosync communication through firewalld (runtime)
+  command: firewall-cmd --add-service=high-availability
+  register: result
+  changed_when: '"ALREADY_ENABLED" not in result.stderr'
+  when: firewalld_state.rc == 0
+
+- name: passwd for hacluster
+  user:
+    name: hacluster
+    password: "{{ 'pacemaker' | password_hash('sha512') }}"
+
+- name: enable pcsd service
+  systemd:
+    name: pcsd
+    enabled: yes
+    state: started
+
