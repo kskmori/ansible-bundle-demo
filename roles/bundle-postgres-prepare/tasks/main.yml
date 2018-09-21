@@ -1,0 +1,29 @@
+- name: create bundle demo working directory
+  file: path={{ BUNDLE_PG_WORK_DIR }} state=directory
+
+- name: prepare Dockerfile
+  template:
+    src: Dockerfile
+    dest: "{{ BUNDLE_PG_WORK_DIR }}/Dockerfile"
+  register: dockerfile
+
+- name: check the bundle container image
+  command: docker images pcmktest:postgres -q
+  changed_when: false
+  register: imageid
+
+- name: remove the bundle container (when changed and old one exist)
+  command: docker rmi pcmktest:postgres
+  changed_when: false
+  when: dockerfile.changed and imageid.stdout != ""
+
+- name: setup --build-arg for proxy configuration
+  command: echo {{ (' --build-arg ' + USE_PROXY|join(' --build-arg ')) if USE_PROXY is defined else '' }}
+  changed_when: false
+  register: buildargs
+
+- name: rebuild the bundle container (when changed or image not exist)
+  command: docker build -t pcmktest:postgres {{ buildargs.stdout }} .
+  args:
+    chdir: "{{ BUNDLE_PG_WORK_DIR }}"
+  when: dockerfile.changed or imageid.stdout == ""

@@ -18,9 +18,16 @@ SYSLOG_FACILITY: local1
 USE_PROXY:
   - http_proxy=http://172.19.0.3:8080/
   - https_proxy=http://172.19.0.3:8080/
-  - no_proxy=localhost,127.0.0.1,192.168.*
+  - no_proxy=localhost,127.0.0.1,10.96.0.0/12,10.244.0.0/16,192.168.122.61,192.168.122.62,192.168.122.69
 
 # Bundle walk through demo variables
 BUNDLE_WORK_DIR: /root/bundle-walk-through
 BUNDLE_REPLICAS: 3
+#
+BUNDLE_PG_WORK_DIR: /root/bundle-postgres
 
+# NFS server for PersistentVolume
+#  must be matched to ansible-kubernetes-demo and completed the provisioning
+NFS_SERVER: 192.168.122.69
+NFS_EXPORT_DIR: /home/nfs
+#

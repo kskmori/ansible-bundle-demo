@@ -1,0 +1,8 @@
+FROM centos/postgresql-96-centos7:9.6
+
+USER root
+RUN yum install -y which
+RUN yum install -y pacemaker pacemaker-remote resource-agents
+
+# The base image assumes that it's always running with this uid
+#USER 26

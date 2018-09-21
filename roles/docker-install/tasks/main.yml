@@ -10,7 +10,10 @@
     enabled: yes
     state: started
 
-
+# Proxy configuration based on the documents
+#   https://docs.docker.com/config/daemon/systemd/
+# alternatives; setting /etc/sysconfig/docker may also works
+#   https://docs.docker.com/network/proxy/
 - name: proxy configuration directory (if configured)
   file: path=/etc/systemd/system/docker.service.d state=directory
   when: USE_PROXY is defined
