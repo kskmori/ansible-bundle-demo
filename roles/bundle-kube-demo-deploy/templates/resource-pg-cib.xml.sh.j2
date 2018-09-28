@@ -1,0 +1,20 @@
+cibadmin --modify --allow-create --scope resources -X '<bundle id="postgres-bundle">
+<docker image="{{ INSECURE_REGISTRY}}/pcmktest:postgres" replicas="1" options="--log-driver=journald" />
+  <network ip-range-start="{{ BUNDLE_PG_CONFIG['ip-range-start'] }}" host-interface="{{ BUNDLE_PG_CONFIG['host-interface'] }}" host-netmask="{{ BUNDLE_PG_CONFIG['host-netmask'] }}">
+    <port-mapping id="postgres-port" port="5432"/>
+  </network>
+  <storage>
+    <storage-mapping id="postgres-pgdata"
+      source-dir-root="/mnt/nfs"
+      target-dir="/var/lib/pgsql/data"
+      options="rw"/>
+  </storage>
+  <primitive class="ocf" id="pgsql" provider="heartbeat" type="pgsql">
+    <instance_attributes id="pgsql-attrs">
+      <nvpair id="pgsql-attrs-pgdata" name="pgdata" value="/var/lib/pgsql/data"/>
+    </instance_attributes>
+    <operations>
+      <op id="pgsql-monitor" name="monitor" interval="30s"/>
+    </operations>
+  </primitive>
+</bundle>'

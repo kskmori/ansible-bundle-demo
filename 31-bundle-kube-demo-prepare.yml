@@ -1,0 +1,11 @@
+- hosts: hacluster
+  become: true
+  max_fail_percentage: 0
+  gather_facts: no
+
+  roles:
+    - role: bundle-kube-demo-prepare
+      tags: bundle-kube-demo-prepare
+
+    - role: bundle-kube-demo-initdb
+      tags: bundle-kube-demo-initdb

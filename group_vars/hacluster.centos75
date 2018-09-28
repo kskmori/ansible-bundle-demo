@@ -23,11 +23,27 @@ USE_PROXY:
 # Bundle walk through demo variables
 BUNDLE_WORK_DIR: /root/bundle-walk-through
 BUNDLE_REPLICAS: 3
-#
+# Bundle postgres sample
 BUNDLE_PG_WORK_DIR: /root/bundle-postgres
+BUNDLE_PG_CONFIG:
+  ip-range-start: 192.168.122.101
+  host-interface: eth3
+  host-netmask: 24
+
+# Bundle kube-demo variables
+BUNDLE_HTTPD_CONFIG:
+  ip-range-start: 192.168.122.102
+  host-interface: eth3
+  host-netmask: 24
+
+# the below must be matched to ansible-kubernetes-demo and completed the provisioning
+# Docker insecure registry
+#  make sure the address is included in no_proxy
+INSECURE_REGISTRY: 192.168.122.69:5000
 
 # NFS server for PersistentVolume
-#  must be matched to ansible-kubernetes-demo and completed the provisioning
 NFS_SERVER: 192.168.122.69
 NFS_EXPORT_DIR: /home/nfs
-#
+
+# working directory for the demo apps
+KUBE_WORK_DIR: /tmp/kube-work

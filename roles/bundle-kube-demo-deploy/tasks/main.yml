@@ -1,0 +1,13 @@
+- name: make sure that working directory exists
+  file:
+    path: "{{ KUBE_WORK_DIR }}"
+    state: directory
+
+- name: generate cib.xml configuration chunks
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ KUBE_WORK_DIR }}/{{ item }}"
+  with_items:
+    - property-cib.xml.sh
+    - resource-pg-cib.xml.sh
+    - resource-httpd-cib.xml.sh

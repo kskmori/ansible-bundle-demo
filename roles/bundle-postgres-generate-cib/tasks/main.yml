@@ -1,0 +1,7 @@
+- name: generate cib.xml configuration chunks
+  template:
+    src: "{{ item }}.j2"
+    dest: "{{ BUNDLE_PG_WORK_DIR }}/{{ item }}"
+  with_items:
+    - property-cib.xml.sh
+    - resource-cib.xml.sh

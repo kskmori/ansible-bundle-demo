@@ -1,0 +1,20 @@
+cibadmin --modify --allow-create --scope resources -X '<bundle id="httpd-bundle">
+  <docker image="{{ INSECURE_REGISTRY}}/pcmktest:httpd" replicas="2" options="--log-driver=journald" />
+  <network ip-range-start="{{ BUNDLE_HTTPD_CONFIG['ip-range-start'] }}" host-interface="{{ BUNDLE_HTTPD_CONFIG['host-interface'] }}" host-netmask="{{ BUNDLE_HTTPD_CONFIG['host-netmask'] }}">
+    <port-mapping id="httpd-port" port="80"/>
+  </network>
+  <storage>
+    <storage-mapping id="httpd-logs"
+      source-dir-root="/var/log/pacemaker/bundles"
+      target-dir="/etc/httpd/logs"
+      options="rw"/>
+  </storage>
+  <primitive class="ocf" id="httpd" provider="heartbeat" type="apache">
+    <instance_attributes id="httpd-attrs">
+      <nvpair id="httpd-attrs-statusurl" name="statusurl" value="http://localhost/index.html"/>
+    </instance_attributes>
+    <operations>
+      <op id="httpd-monitor" name="monitor" interval="30s"/>
+    </operations>
+  </primitive>
+</bundle>'
