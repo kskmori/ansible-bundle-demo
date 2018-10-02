@@ -1,0 +1,34 @@
+- name: force to initialize the authkey for pacemaker-remote (when specified)
+  file:
+    path: /etc/pacemaker
+    state: absent
+  tags: never, force-init-authkey
+
+- name: create pacemaker-remote authkey directory
+  file:
+    path: /etc/pacemaker
+    state: directory
+    group: haclient
+    mode: 0750
+
+- stat:
+    path: /etc/pacemaker/authkey
+  register: authkey
+
+# TODO: to work properly when authkey exists only in the first node
+- name: generate authkey for pacemaker-remote (if not exists)
+  become: false
+  local_action: command dd if=/dev/urandom of={{ role_path }}/files/authkey bs=4096 count=1
+  when: not authkey.stat.exists
+  run_once: true
+
+- name: distribute authkey for pacemaker-remote
+  copy:
+    src: authkey
+    dest: /etc/pacemaker/authkey
+  when: not authkey.stat.exists
+
+- name: cleanup temporary files
+  become: false
+  local_action: file path={{ role_path }}/files/authkey state=absent
+  run_once: true

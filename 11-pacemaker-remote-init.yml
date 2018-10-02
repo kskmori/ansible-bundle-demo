@@ -1,0 +1,13 @@
+# Ref. Pacemaker Remote documents
+#  4.1.4. Configure Pacemaker for Remote Node Communication
+#  http://clusterlabs.org/pacemaker/doc/en-US/Pacemaker/1.1/html-single/Pacemaker_Remote/#_configure_pacemaker_for_remote_node_communication
+#
+# This role is not necessary if you have created the cluster
+#  by 'pcs cluster setup' with the CentOS bundled pacemaker.
+- hosts: hacluster
+  become: true
+  max_fail_percentage: 0
+  gather_facts: no
+
+  roles:
+    - role: pacemaker-remote-init
