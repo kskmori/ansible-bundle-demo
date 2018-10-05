@@ -1,0 +1,16 @@
+
+cibadmin --modify --allow-create --scope constraints -X '
+      <rsc_location id="loc-stonith-worker1" rsc="stonith-worker1">
+        <rule score="-INFINITY" id="loc-stonith-worker1-rule">
+          <expression attribute="#uname" operation="eq" value="worker1" id="loc-stonith-worker1-rule-expression"/>
+        </rule>
+      </rsc_location>
+'
+
+cibadmin --modify --allow-create --scope constraints -X '
+      <rsc_location id="loc-stonith-worker2" rsc="stonith-worker2">
+        <rule score="-INFINITY" id="loc-stonith-worker2-rule">
+          <expression attribute="#uname" operation="eq" value="worker2" id="loc-stonith-worker2-rule-expression"/>
+        </rule>
+      </rsc_location>
+'

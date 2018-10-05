@@ -1,0 +1,32 @@
+cibadmin --modify --allow-create --scope resources -X '
+      <primitive id="stonith-worker2" class="stonith" type="external/ipmi">
+        <instance_attributes id="stonith-worker2-instance_attributes">
+          <nvpair name="hostname" value="worker2" id="stonith-worker2-instance_attributes-hostname"/>
+          <nvpair name="ipaddr" value="192.168.33.92" id="stonith-worker2-instance_attributes-ipaddr"/>
+          <nvpair name="userid" value="pacemaker" id="stonith-worker2-instance_attributes-userid"/>
+          <nvpair name="passwd" value="pacemakerpass1" id="stonith-worker2-instance_attributes-passwd"/>
+          <nvpair name="interface" value="lanplus" id="stonith-worker2-instance_attributes-interface"/>
+        </instance_attributes>
+        <operations>
+          <op name="start" timeout="60s" on-fail="restart" interval="0" id="stonith-worker2-start-0"/>
+          <op name="monitor" timeout="60s" interval="3600s" on-fail="restart" id="stonith-worker2-monitor-3600s"/>
+          <op name="stop" timeout="60s" on-fail="ignore" interval="0" id="stonith-worker2-stop-0"/>
+        </operations>
+      </primitive>
+'
+cibadmin --modify --allow-create --scope resources -X '
+      <primitive id="stonith-worker1" class="stonith" type="external/ipmi">
+        <instance_attributes id="stonith-worker1-instance_attributes">
+          <nvpair name="hostname" value="worker1" id="stonith-worker1-instance_attributes-hostname"/>
+          <nvpair name="ipaddr" value="192.168.33.91" id="stonith-worker1-instance_attributes-ipaddr"/>
+          <nvpair name="userid" value="pacemaker" id="stonith-worker1-instance_attributes-userid"/>
+          <nvpair name="passwd" value="pacemakerpass1" id="stonith-worker1-instance_attributes-passwd"/>
+          <nvpair name="interface" value="lanplus" id="stonith-worker1-instance_attributes-interface"/>
+        </instance_attributes>
+        <operations>
+          <op name="start" timeout="60s" on-fail="restart" interval="0" id="stonith-worker1-start-0"/>
+          <op name="monitor" timeout="60s" interval="3600s" on-fail="restart" id="stonith-worker1-monitor-3600s"/>
+          <op name="stop" timeout="60s" on-fail="ignore" interval="0" id="stonith-worker1-stop-0"/>
+        </operations>
+      </primitive>
+'
