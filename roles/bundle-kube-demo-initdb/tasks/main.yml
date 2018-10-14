@@ -23,7 +23,7 @@
 # the database initialization will be done by the script inside the container 
 # giving --version option is to just exit after the initialization
 - name: initialize the database
-  command: docker run --name pg-init -v /mnt/nfs/postgres-bundle-0:/var/lib/pgsql/data {{ INSECURE_REGISTRY }}/pcmktest:postgres postgres --version
+  command: docker run --name pg-init -v /mnt/nfs/postgres-bundle-0:/var/lib/pgsql/data {{ APPS_POSTGRES_IMAGE }} postgres --version
   run_once: true
 
 - name: remove the initialization container

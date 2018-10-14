@@ -8,8 +8,8 @@
     src: "{{ item }}.j2"
     dest: "{{ KUBE_WORK_DIR }}/{{ item }}"
   with_items:
-    - 1-property-cib.xml.sh.j2
-    - 2-resource-stonith-cib.xml.sh.j2
-    - 3-constraints-stonith-cib.xml.sh.j2
-    - 4-resource-pg-cib.xml.sh.j2
-    - 5-resource-httpd-cib.xml.sh.j2
+    - 1-property-cib.xml.sh
+    - 2-resource-stonith-cib.xml.sh
+    - 3-constraints-stonith-cib.xml.sh
+    - 4-resource-pg-cib.xml.sh
+    - 5-resource-httpd-cib.xml.sh

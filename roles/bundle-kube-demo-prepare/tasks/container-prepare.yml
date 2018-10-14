@@ -1,0 +1,26 @@
+# the current pacemaker-remote always overrides mount on /var/log
+# so this storage-mapping is always necessary.
+# without this httpd will fail to start because /var/log/httpd is missing.
+- name: create bundle log directory
+  file: path=/var/log/pacemaker/bundles/{{ bundle_name }} state=directory
+
+- name: create httpd config directory
+  file: path=/var/local/containers/conf.d/{{ bundle_name }} state=directory
+- name: create httpd contents directory
+  file: path=/var/local/containers/www/{{ bundle_name }}/html state=directory
+- name: create httpd cgi directory
+  file: path=/var/local/containers/www/{{ bundle_name }}/cgi-bin state=directory
+
+- name: httpd bundle sample apps app.conf
+  copy:
+    src: app.conf
+    dest: "/var/local/containers/conf.d/{{ bundle_name }}/app.conf"
+- name: httpd bundle sample apps index.html
+  copy:
+    src: index.html
+    dest: "/var/local/containers/www/{{ bundle_name }}/html/index.html"
+- name: httpd bundle sample apps selectnow
+  copy:
+    src: selectnow
+    dest: "/var/local/containers/www/{{ bundle_name }}/cgi-bin/selectnow"
+    mode: 0755

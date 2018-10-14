@@ -47,3 +47,7 @@ NFS_EXPORT_DIR: /home/nfs
 
 # working directory for the demo apps
 KUBE_WORK_DIR: /tmp/kube-work
+# image names of the demo apps
+#  ansible-kubernetes-demo is required to build these images
+APPS_POSTGRES_IMAGE: "{{ INSECURE_REGISTRY }}/pcmkdemo/postgres:0.1"
+APPS_HTTPD_IMAGE: "{{ INSECURE_REGISTRY }}/pcmkdemo/httpd:0.1"

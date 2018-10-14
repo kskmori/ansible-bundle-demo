@@ -1,5 +1,5 @@
 cibadmin --modify --allow-create --scope resources -X '<bundle id="postgres-bundle">
-<docker image="{{ INSECURE_REGISTRY}}/pcmktest:postgres" replicas="1" options="--log-driver=journald" />
+<docker image="{{ APPS_POSTGRES_IMAGE}}" replicas="1" options="--log-driver=journald" />
   <network ip-range-start="{{ BUNDLE_PG_CONFIG['ip-range-start'] }}" host-interface="{{ BUNDLE_PG_CONFIG['host-interface'] }}" host-netmask="{{ BUNDLE_PG_CONFIG['host-netmask'] }}">
     <port-mapping id="postgres-port" port="5432"/>
   </network>

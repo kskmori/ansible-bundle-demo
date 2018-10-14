@@ -1,10 +1,7 @@
-# the current pacemaker-remote always overrides mount on /var/log
-# httpd will fail to start because /var/log/httpd not existing
-# so we need to have storage-mappings in httpd-bundles.
 - name: create bundle log directory
-  file:
-    path: /var/log/pacemaker/bundles/{{ item }}
-    state: directory
+  include_tasks: container-prepare.yml
+  loop_control:
+    loop_var: bundle_name
   with_items:
     - "httpd-bundle-0"
     - "httpd-bundle-1"
@@ -12,5 +9,5 @@
 - name: pull container images
   command: docker pull {{ item }}
   with_items:
-    - "{{ INSECURE_REGISTRY }}/pcmktest:postgres"
-    - "{{ INSECURE_REGISTRY }}/pcmktest:httpd"
+    - "{{ APPS_POSTGRES_IMAGE }}"
+    - "{{ APPS_HTTPD_IMAGE }}"
