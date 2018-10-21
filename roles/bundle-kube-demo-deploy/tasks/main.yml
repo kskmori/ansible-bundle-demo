@@ -3,13 +3,12 @@
     path: "{{ KUBE_WORK_DIR }}"
     state: directory
 
-- name: generate cib.xml configuration chunks
+- name: generate cib.xml configuration
   template:
     src: "{{ item }}.j2"
     dest: "{{ KUBE_WORK_DIR }}/{{ item }}"
   with_items:
-    - 1-property-cib.xml.sh
-    - 2-resource-stonith-cib.xml.sh
-    - 3-constraints-stonith-cib.xml.sh
-    - 4-resource-pg-cib.xml.sh
-    - 5-resource-httpd-cib.xml.sh
+    - bundle-all-cib.xml
+
+- name: apply cib.xml configuration
+  command: cibadmin --modify --xml-file {{ KUBE_WORK_DIR }}/bundle-all-cib.xml

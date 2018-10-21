@@ -1,0 +1,94 @@
+<cib crm_feature_set="3.0.13" validate-with="pacemaker-2.9" epoch="0" num_updates="0" admin_epoch="admin_epoch++">
+  <configuration>
+    <crm_config>
+      <cluster_property_set id="cib-bootstrap-options">
+        <nvpair name="no-quorum-policy" value="ignore" id="cib-bootstrap-options-no-quorum-policy"/>
+        <nvpair name="stonith-enabled" value="true" id="cib-bootstrap-options-stonith-enabled"/>
+        <nvpair name="stonith-action" value="off" id="cib-bootstrap-options-stonith-action"/>
+        <nvpair name="startup-fencing" value="false" id="cib-bootstrap-options-startup-fencing"/>
+      </cluster_property_set>
+    </crm_config>
+    <nodes>
+    </nodes>
+    <resources>
+      <bundle id="postgres-bundle">
+        <docker image="{{ APPS_POSTGRES_IMAGE}}" replicas="1" options="--log-driver=journald" />
+        <network ip-range-start="{{ BUNDLE_PG_CONFIG['ip-range-start'] }}" host-interface="{{ BUNDLE_PG_CONFIG['host-interface'] }}" host-netmask="{{ BUNDLE_PG_CONFIG['host-netmask'] }}">
+          <port-mapping id="postgres-port" port="5432"/>
+        </network>
+        <storage>
+          <storage-mapping id="postgres-pgdata" source-dir-root="/mnt/nfs" target-dir="/var/lib/pgsql/data" options="rw"/>
+        </storage>
+        <primitive class="ocf" id="pgsql" provider="heartbeat" type="pgsql">
+          <instance_attributes id="pgsql-attrs">
+            <nvpair id="pgsql-attrs-pgdata" name="pgdata" value="/var/lib/pgsql/data"/>
+          </instance_attributes>
+          <operations>
+            <op id="pgsql-monitor" name="monitor" interval="30s"/>
+          </operations>
+        </primitive>
+      </bundle>
+      <bundle id="httpd-bundle">
+	<docker image="{{ APPS_HTTPD_IMAGE}}" replicas="2" replicas-per-host="2" options="--log-driver=journald" />
+	<network ip-range-start="{{ BUNDLE_HTTPD_CONFIG['ip-range-start'] }}" host-interface="{{ BUNDLE_HTTPD_CONFIG['host-interface'] }}" host-netmask="{{ BUNDLE_HTTPD_CONFIG['host-netmask'] }}">
+          <port-mapping id="httpd-port" port="80"/>
+        </network>
+        <storage>
+          <storage-mapping id="httpd-logs" source-dir-root="/var/log/pacemaker/bundles" target-dir="/etc/httpd/logs" options="rw"/>
+          <storage-mapping id="httpd-conf" source-dir-root="/var/local/containers/conf.d" target-dir="/etc/httpd/conf.d" options="rw"/>
+          <storage-mapping id="httpd-www" source-dir-root="/var/local/containers/www" target-dir="/var/www" options="rw"/>
+        </storage>
+        <primitive class="ocf" id="httpd" provider="heartbeat" type="apache">
+          <instance_attributes id="httpd-attrs">
+            <nvpair id="httpd-attrs-statusurl" name="statusurl" value="http://localhost/index.html"/>
+          </instance_attributes>
+          <operations>
+            <op id="httpd-monitor" name="monitor" interval="30s"/>
+          </operations>
+        </primitive>
+      </bundle>
+      <primitive id="stonith-worker2" class="stonith" type="external/ipmi">
+        <instance_attributes id="stonith-worker2-instance_attributes">
+          <nvpair name="hostname" value="worker2" id="stonith-worker2-instance_attributes-hostname"/>
+          <nvpair name="ipaddr" value="192.168.33.92" id="stonith-worker2-instance_attributes-ipaddr"/>
+          <nvpair name="userid" value="pacemaker" id="stonith-worker2-instance_attributes-userid"/>
+          <nvpair name="passwd" value="pacemakerpass1" id="stonith-worker2-instance_attributes-passwd"/>
+          <nvpair name="interface" value="lanplus" id="stonith-worker2-instance_attributes-interface"/>
+        </instance_attributes>
+        <operations>
+          <op name="start" timeout="60s" on-fail="restart" interval="0" id="stonith-worker2-start-0"/>
+          <op name="monitor" timeout="60s" interval="3600s" on-fail="restart" id="stonith-worker2-monitor-3600s"/>
+          <op name="stop" timeout="60s" on-fail="ignore" interval="0" id="stonith-worker2-stop-0"/>
+        </operations>
+      </primitive>
+      <primitive id="stonith-worker1" class="stonith" type="external/ipmi">
+        <instance_attributes id="stonith-worker1-instance_attributes">
+          <nvpair name="hostname" value="worker1" id="stonith-worker1-instance_attributes-hostname"/>
+          <nvpair name="ipaddr" value="192.168.33.91" id="stonith-worker1-instance_attributes-ipaddr"/>
+          <nvpair name="userid" value="pacemaker" id="stonith-worker1-instance_attributes-userid"/>
+          <nvpair name="passwd" value="pacemakerpass1" id="stonith-worker1-instance_attributes-passwd"/>
+          <nvpair name="interface" value="lanplus" id="stonith-worker1-instance_attributes-interface"/>
+        </instance_attributes>
+        <operations>
+          <op name="start" timeout="60s" on-fail="restart" interval="0" id="stonith-worker1-start-0"/>
+          <op name="monitor" timeout="60s" interval="3600s" on-fail="restart" id="stonith-worker1-monitor-3600s"/>
+          <op name="stop" timeout="60s" on-fail="ignore" interval="0" id="stonith-worker1-stop-0"/>
+        </operations>
+      </primitive>
+    </resources>
+    <constraints>
+      <rsc_location id="loc-stonith-worker1" rsc="stonith-worker1">
+        <rule score="-INFINITY" id="loc-stonith-worker1-rule">
+          <expression attribute="#uname" operation="eq" value="worker1" id="loc-stonith-worker1-rule-expression"/>
+        </rule>
+      </rsc_location>
+      <rsc_location id="loc-stonith-worker2" rsc="stonith-worker2">
+        <rule score="-INFINITY" id="loc-stonith-worker2-rule">
+          <expression attribute="#uname" operation="eq" value="worker2" id="loc-stonith-worker2-rule-expression"/>
+        </rule>
+      </rsc_location>
+    </constraints>
+  </configuration>
+  <status>
+  </status>
+</cib>
